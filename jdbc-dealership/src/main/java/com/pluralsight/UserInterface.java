@@ -1,5 +1,7 @@
 package com.pluralsight;
 
+import com.pluralsight.daos.VehicleDao;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -7,6 +9,7 @@ import java.util.Scanner;
 public class UserInterface {
     // DeclareDealership object to manage dealership data
     private Dealership dealership;
+    private VehicleDao vehicleDao = new VehicleDao(DatabaseConnector.setUpConnection());
     // Initialization of a Scanner object for user input
     Scanner scanner = new Scanner(System.in);
     ContractDataManager contractDataManager = new ContractDataManager();
@@ -20,12 +23,6 @@ public class UserInterface {
         DealershipFileManager manager = new DealershipFileManager();
         // Retrieve dealership information from the file
         this.dealership = manager.getDealership();
-    }
-
-    private void saveNewDealership() {
-        DealershipFileManager manager = new DealershipFileManager();
-        // Save the updated dealership information to the file
-        manager.saveDealership(dealership);
     }
 
     // Display details of vehicles in the provided ArrayList
@@ -192,8 +189,6 @@ public class UserInterface {
         System.out.println(vehicleSold);
         // delete from inventory
         dealership.removeVehicle(vehicleSold);
-        // delete from csv it reads current inventory and rewrites entire csv
-        saveNewDealership();
         return vehicleSold;
     }
 
@@ -205,20 +200,15 @@ public class UserInterface {
             System.out.print("Min : ");
             double min = scanner.nextDouble();
             scanner.nextLine();
+            ArrayList<Vehicle> inRange = vehicleDao.getVehiclesByPrice(min, max);
             // Create a new ArrayList to store vehicles that fall within the specified price range
-            ArrayList<Vehicle> inRange = new ArrayList<>();
             // boolean for matching result
             boolean match = false;
-            // Iterate through all vehicles in the dealership to check if their prices fall within the specified range
-            for (Vehicle vehicle : dealership.getAllVehicles()) {
-                // Check if the price of the current vehicle is greater than or equal to the minimum price
-                // and less than or equal to the maximum price
-                if (vehicle.getPrice() >= min && vehicle.getPrice() <= max) {
-                    // If the vehicle's price falls within the range, add it to the 'inRange' ArrayList
-                    inRange.add(vehicle);
-                    match = true;
-                }
+
+            if(!inRange.isEmpty()){
+                match = true;
             }
+
             // Display vehicles in the price range
             displayVehicles(inRange);
             // display message for match result
@@ -246,16 +236,12 @@ public class UserInterface {
         // boolean for matching result
         boolean match = false;
         // Create a new ArrayList to store vehicles that fall within the specified price range
-        ArrayList<Vehicle> matchingMakeModel = new ArrayList<>();
-        for (Vehicle car : dealership.getAllVehicles()) {
-            String make = car.getMake().toLowerCase();
-            String model = car.getModel().toLowerCase();
-            // check for matching make and model
-            if (model.contains(modelInput) && make.contains(makeInput)) {
-                matchingMakeModel.add(car);
-                match = true;
-            }
+        ArrayList<Vehicle> matchingMakeModel = vehicleDao.getVehiclesByMakeAndModel(makeInput, modelInput);
+
+        if(!matchingMakeModel.isEmpty()){
+            match = true;
         }
+
         // pass matching vehicles to display
         displayVehicles(matchingMakeModel);
         // display message for match result
@@ -273,19 +259,11 @@ public class UserInterface {
             int year = scanner.nextInt();
             // clear buffer
             scanner.nextLine();
-            // set match to false until match is founf
-            boolean match = false;
+
             // create new arraylist to hold matching vehicles
-            ArrayList<Vehicle> yearMatch = new ArrayList<>();
-            // loop through all vehicles checking for possible match
-            for (Vehicle vehicle : dealership.getAllVehicles()) {
-                if (vehicle.getYear() == year) {
-                    // add match to array list
-                    yearMatch.add(vehicle);
-                    // set bool to true
-                    match = true;
-                }
-            }
+            ArrayList<Vehicle> yearMatch =vehicleDao.getVehiclesByYear(year);
+            // set match to false until match is founf
+            boolean match = yearMatch.isEmpty() ? false : true;
             // send matching vehicles to be displayed
             displayVehicles(yearMatch);
             // display match results
@@ -307,16 +285,10 @@ public class UserInterface {
         System.out.println("**** You have chosen to search by color! ****");
         System.out.print("Please provide the color: ");
         String color = scanner.nextLine().trim().toLowerCase();
-        boolean match = false;
+
         // create array list for matching color vehicles
-        ArrayList<Vehicle> matchingColor = new ArrayList<>();
-        for (Vehicle vehicle : dealership.getAllVehicles()) {
-            if (vehicle.getColor().toLowerCase().contains(color)) {
-                // add vehicle if color matches
-                matchingColor.add(vehicle);
-                match = true;
-            }
-        }
+        ArrayList<Vehicle> matchingColor = vehicleDao.getVehiclesByColor(color);
+        boolean match = matchingColor.isEmpty() ? false : true;
         // call display method
         displayVehicles(matchingColor);
         if (!match) {
@@ -336,19 +308,10 @@ public class UserInterface {
             double min = scanner.nextDouble();
             scanner.nextLine();
             // Create a new ArrayList to store vehicles that fall within the specified price range
-            ArrayList<Vehicle> mileageMatch = new ArrayList<>();
+            ArrayList<Vehicle> mileageMatch = vehicleDao.getVehiclesByMileage(min, max);
             // boolean for matching result
-            boolean match = false;
-            // Iterate through all vehicles in the dealership to check if their prices fall within the specified range
-            for (Vehicle vehicle : dealership.getAllVehicles()) {
-                // Check if the price of the current vehicle is greater than or equal to the minimum price
-                // and less than or equal to the maximum price
-                if (vehicle.getOdometer() >= min && vehicle.getOdometer() <= max) {
-                    // If the vehicle's price falls within the range, add it to the 'inRange' ArrayList
-                    mileageMatch.add(vehicle);
-                    match = true;
-                }
-            }
+            boolean match = mileageMatch.isEmpty() ? false : true;
+
             // Display vehicles in the price range
             displayVehicles(mileageMatch);
             // display message for match result
@@ -371,15 +334,9 @@ public class UserInterface {
         System.out.print("Selection: ");
         String carType = scanner.nextLine().trim().toLowerCase();
 
-        boolean match = false;
-        ArrayList<Vehicle> matchingType = new ArrayList<>();
-        // search for matching vehicle type
-        for (Vehicle vehicle : dealership.getAllVehicles()) {
-            if (vehicle.getVehicleType().toLowerCase().contains(carType)) {
-                matchingType.add(vehicle);
-                match = true;
-            }
-        }
+        ArrayList<Vehicle> matchingType = vehicleDao.getVehiclesByType(carType);
+
+        boolean match = matchingType.isEmpty() ? false : true;
         // call display method
         displayVehicles(matchingType);
         // display message for match result
@@ -424,8 +381,6 @@ public class UserInterface {
             System.out.println("\n**** Vehicle had been added ****");
             System.out.println(vehicle);
             System.out.println("\n**** Thank you for registering you vehicle today!  ****");
-            // rewrite file by calling method that handles rewrite.
-            saveNewDealership();
         } catch (Exception e) {
             // catch error from int or double
             scanner.nextLine();
@@ -458,8 +413,6 @@ public class UserInterface {
                     break;
                 }
             }
-            // rewrite file by calling method that handles rewrite.
-            saveNewDealership();
             if (!found) {
                 System.out.println("\n**** Car not found with matching vin number! ****");
             } else {

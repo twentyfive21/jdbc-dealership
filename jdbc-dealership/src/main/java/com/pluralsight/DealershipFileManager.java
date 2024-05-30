@@ -29,28 +29,70 @@ public class DealershipFileManager {
         return dealership;
     }
 
-    // overwrite the inventory file with current dealership information
-    public void saveDealership(Dealership dealership){
-     try{// create new buf writer to write to file
-         BufferedWriter bufWriter = new BufferedWriter(new FileWriter("inventory.csv"));
-         // write first line of dealership object
-         bufWriter.write(dealership.getName() + "|" + dealership.getAddress() + "|" + dealership.getPhone());
-         // ship new line for vehicles
-         bufWriter.newLine();
-         String pipe = "|";
-         // loop through array list and add each vehicle
-         for(Vehicle car : dealership.getAllVehicles()){
-             bufWriter.write(car.getVin()+ pipe +car.getYear()+ pipe + car.getMake() + pipe
-                     +car.getModel()+ pipe + car.getVehicleType()+ pipe + car.getColor()+ pipe +
-                     car.getOdometer()+ pipe + car.getPrice());
-             // new line so vehicles are not stacked on top of each other
-             bufWriter.newLine();
-         }
-         // close the writer
-         bufWriter.flush();
-         bufWriter.close();
-     }catch (Exception e){
-         System.out.println("Error saving new dealership info");
-     }
-    }
+   /*   ------------------ SEARCH QUERIES  -----------------------
+
+     SELECT * FROM carDealership.Vehicles WHERE Price <= 30000 AND Price >= 27000;
+     SELECT * FROM carDealership.Vehicles WHERE Make LIKE '%Toyota%' AND Model LIKE '%Camry%';
+     SELECT * FROM carDealership.Vehicles WHERE VehicleYear = 2020;
+     SELECT * FROM carDealership.Vehicles WHERE Color LIKE '%blue%';
+      SELECT * FROM carDealership.Vehicles WHERE Odometer >= 4000 AND Odometer <= 18000;
+     SELECT * FROM carDealership.Vehicles WHERE VehicleType LIKE '%sedan%';
+
+
+     */
+
+
+    /* ------------------ deleting vehicle -----------------------
+
+    // when deleting a vehicle delete from contracts first, inventory, then lastly vehicle
+    // DELETE FROM carDealership.LeaseContracts WHERE Vin = 1006;
+    // DELETE FROM carDealership.SalesContracts WHERE Vin = 1006;
+    // DELETE FROM carDealership.Inventory WHERE Vin = 1006;
+    // DELETE FROM carDealership.Vehicles WHERE Vin = 1006;
+
+    */
+
+
+    /* ------------------ ADDING vehicle -----------------------
+
+    // when adding a vehicle add to the vehicle table first then inventory table
+
+    INSERT INTO Vehicles (Vin, VehicleYear, Make, Model, VehicleType, Color, Odometer, Price, Sold) VALUES
+    (1001, 2020, 'Toyota', 'Camry', 'Sedan', 'Blue', 15000, 22000.00, FALSE),
+
+    INSERT INTO Inventory (Dealership_id,Vin)
+    VALUES (1, 1001);
+
+    */
+
+
+
+ /* ------------------ VEHICLE SALE -----------------------
+    // when doing a sale add to sales contract and set vehicle tables sold value to true
+     SELECT Vin FROM carDealership.SalesContracts; check for vins that do not match these
+     if not matching
+
+    INSERT INTO SalesContracts (Vin)
+    VALUES (1001);
+
+  */
+
+
+    /* ------------------ VEHICLE LEASE  -----------------------
+    // when leasing a vehicle check if in lease table if not allow to be leased
+    // show vehicles not leased
+
+        SELECT *
+        FROM carDealership.Vehicles
+        LEFT JOIN LeaseContracts ON Vehicles.Vin = LeaseContracts.Vin
+        WHERE LeaseContracts.Vin IS NULL;
+
+    // check if users vin is in lease if not add it use this to check
+     SELECT Vin FROM carDealership.LeaseContracts;
+
+    // then insert if doesnt match
+     INSERT INTO LeaseContracts (Vin)
+    VALUES (1001);
+
+     */
 }

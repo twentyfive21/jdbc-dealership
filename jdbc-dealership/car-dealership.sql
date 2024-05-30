@@ -43,7 +43,7 @@ FOREIGN KEY(Dealership_id) REFERENCES Dealerships (Dealership_id)
 -- CREATE sales contract table
 CREATE TABLE SalesContracts(
 SaleId int AUTO_INCREMENT,
-Vin int,
+Vin int UNIQUE,
 PRIMARY KEY(SaleId),
 FOREIGN KEY(Vin) REFERENCES Vehicles (Vin)
 );
@@ -51,7 +51,7 @@ FOREIGN KEY(Vin) REFERENCES Vehicles (Vin)
 -- CREATE lease contracts table
 CREATE TABLE LeaseContracts(
 LeaseId int AUTO_INCREMENT,
-Vin int,
+Vin int UNIQUE,
 PRIMARY KEY(LeaseId),
 FOREIGN KEY(Vin) REFERENCES Vehicles (Vin)
 );
