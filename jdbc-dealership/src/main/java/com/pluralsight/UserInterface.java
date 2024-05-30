@@ -377,8 +377,8 @@ public class UserInterface {
             // use constructor to instantiate a new Vehicle object
             Vehicle vehicle = new Vehicle(vin, year, make, model, vehicleType, color, odometer, price);
             // add new vehicle to arraylist
+            vehicleDao.addVehicleToDB(vehicle);
             dealership.addVehicle(vehicle);
-            System.out.println("\n**** Vehicle had been added ****");
             System.out.println(vehicle);
             System.out.println("\n**** Thank you for registering you vehicle today!  ****");
         } catch (Exception e) {
@@ -403,6 +403,7 @@ public class UserInterface {
             for (Vehicle vehicle : dealership.getAllVehicles()) {
                 if (vehicle.getVin() == vin) {
                     dealership.removeVehicle(vehicle);
+                    vehicleDao.removeVehicleToDB(vin);
                     tempVehicle = vehicle;
                     found = true;
                     /* must break when finding a match! else
@@ -413,6 +414,8 @@ public class UserInterface {
                     break;
                 }
             }
+
+
             if (!found) {
                 System.out.println("\n**** Car not found with matching vin number! ****");
             } else {

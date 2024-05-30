@@ -339,4 +339,68 @@ public class VehicleDao {
         }
         return allVehiclesFromDB;
     }
+
+    public void addVehicleToDB(Vehicle vehicle) {
+        try {
+            try (
+                    Connection connection = dataSource.getConnection();
+                    PreparedStatement preparedStatement1 = connection.prepareStatement(
+                            "INSERT INTO Vehicles (Vin, VehicleYear, Make, Model, VehicleType, Color, Odometer, Price, Sold) " +
+                                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, FALSE)");
+                    PreparedStatement preparedStatement2 = connection.prepareStatement(
+                            "INSERT INTO Inventory (Dealership_id, Vin) VALUES (1, ?)")
+            ) {
+                // Insert into Vehicles table
+                preparedStatement1.setInt(1, vehicle.getVin());
+                preparedStatement1.setInt(2, vehicle.getYear());
+                preparedStatement1.setString(3, vehicle.getMake());
+                preparedStatement1.setString(4, vehicle.getModel());
+                preparedStatement1.setString(5, vehicle.getVehicleType());
+                preparedStatement1.setString(6, vehicle.getColor());
+                preparedStatement1.setInt(7, vehicle.getOdometer());
+                preparedStatement1.setDouble(8, vehicle.getPrice());
+                preparedStatement1.executeUpdate();
+
+                // Insert into Inventory table
+                preparedStatement2.setInt(1, vehicle.getVin());
+                preparedStatement2.executeUpdate();
+
+                System.out.println("Vehicle added to Vehicles and Inventory tables successfully");
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeVehicleToDB(int userVin) {
+        try {
+            try (
+                    Connection connection = dataSource.getConnection();
+                    PreparedStatement preparedStatement1 = connection.prepareStatement(
+                            "DELETE FROM LeaseContracts WHERE Vin = ?");
+                    PreparedStatement preparedStatement2 = connection.prepareStatement(
+                            "DELETE FROM SalesContracts WHERE Vin = ?");
+                    PreparedStatement preparedStatement3 = connection.prepareStatement(
+                            "DELETE FROM Inventory WHERE Vin = ?");
+                    PreparedStatement preparedStatement4 = connection.prepareStatement(
+                            "DELETE FROM Vehicles WHERE Vin = ?");
+            ) {
+                preparedStatement1.setInt(1, userVin);
+                preparedStatement1.executeUpdate();
+                preparedStatement2.setInt(1, userVin);
+                preparedStatement2.executeUpdate();
+                preparedStatement3.setInt(1, userVin);
+                preparedStatement3.executeUpdate();
+                preparedStatement4.setInt(1, userVin);
+                preparedStatement4.executeUpdate();
+
+                System.out.println("Vehicle deleted from Vehicles and Inventory tables successfully");
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

@@ -28,20 +28,6 @@ public class DealershipFileManager {
         currentVehicles.forEach(dealership::addVehicle);
         return dealership;
     }
-
-   /*   ------------------ SEARCH QUERIES  -----------------------
-
-     SELECT * FROM carDealership.Vehicles WHERE Price <= 30000 AND Price >= 27000;
-     SELECT * FROM carDealership.Vehicles WHERE Make LIKE '%Toyota%' AND Model LIKE '%Camry%';
-     SELECT * FROM carDealership.Vehicles WHERE VehicleYear = 2020;
-     SELECT * FROM carDealership.Vehicles WHERE Color LIKE '%blue%';
-      SELECT * FROM carDealership.Vehicles WHERE Odometer >= 4000 AND Odometer <= 18000;
-     SELECT * FROM carDealership.Vehicles WHERE VehicleType LIKE '%sedan%';
-
-
-     */
-
-
     /* ------------------ deleting vehicle -----------------------
 
     // when deleting a vehicle delete from contracts first, inventory, then lastly vehicle
@@ -49,19 +35,6 @@ public class DealershipFileManager {
     // DELETE FROM carDealership.SalesContracts WHERE Vin = 1006;
     // DELETE FROM carDealership.Inventory WHERE Vin = 1006;
     // DELETE FROM carDealership.Vehicles WHERE Vin = 1006;
-
-    */
-
-
-    /* ------------------ ADDING vehicle -----------------------
-
-    // when adding a vehicle add to the vehicle table first then inventory table
-
-    INSERT INTO Vehicles (Vin, VehicleYear, Make, Model, VehicleType, Color, Odometer, Price, Sold) VALUES
-    (1001, 2020, 'Toyota', 'Camry', 'Sedan', 'Blue', 15000, 22000.00, FALSE),
-
-    INSERT INTO Inventory (Dealership_id,Vin)
-    VALUES (1, 1001);
 
     */
 
