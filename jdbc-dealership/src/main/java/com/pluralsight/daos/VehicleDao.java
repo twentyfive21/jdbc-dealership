@@ -66,7 +66,7 @@ public class VehicleDao {
         try{
             try(
                     Connection connection = dataSource.getConnection();
-                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM carDealership.Vehicles WHERE Price >= ? AND Price <= ?;")
+                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM carDealership.Vehicles WHERE Price >= ? AND Price <= ? ORDER BY Price;")
             ){
                 // no need to set string since passed already with no parameters
                 preparedStatement.setDouble(1,min);
@@ -160,7 +160,7 @@ public class VehicleDao {
         try{
             try(
                     Connection connection = dataSource.getConnection();
-                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Vehicles WHERE VehicleYear = ?;")
+                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Vehicles WHERE VehicleYear = ? ORDER BY VehicleYear;")
             ){
                 // no need to set string since passed already with no parameters
                 preparedStatement.setInt(1, userYear);
@@ -188,7 +188,7 @@ public class VehicleDao {
                         } while (resultSet.next());
                     }
                     else {
-                        System.out.println("Error getting vehicles from database");
+                        System.out.println("\n ~~~~ No matching vehicles in that year ~~~~");
                     }
                 }
             }
@@ -196,7 +196,8 @@ public class VehicleDao {
         }catch (SQLException e){
             // This will catch all SQLExceptions occurring in the
             // block including those in nested try statements
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.out.println("Error getting vehicle by year");
         }
         return allVehiclesFromDB;
     }
@@ -252,7 +253,7 @@ public class VehicleDao {
         try{
             try(
                     Connection connection = dataSource.getConnection();
-                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Vehicles WHERE Odometer >= ? AND Odometer <= ?;")
+                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Vehicles WHERE Odometer >= ? AND Odometer <= ? ORDER BY Odometer;")
             ){
                 // no need to set string since passed already with no parameters
                 preparedStatement.setDouble(1, minMiles);

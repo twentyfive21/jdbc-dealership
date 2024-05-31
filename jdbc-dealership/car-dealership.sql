@@ -91,14 +91,8 @@ VALUES
 
 INSERT INTO SalesContracts (Vin)
 Values
-(1002),
-(1004),
-(1006),
-(1008),
-(1010);
+(1002);
 
 INSERT INTO LeaseContracts (Vin)
 VALUES
-(1001),
-(1003),
-(1005);
+(1001);

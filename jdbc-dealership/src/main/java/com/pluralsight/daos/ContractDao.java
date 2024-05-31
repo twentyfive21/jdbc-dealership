@@ -25,7 +25,6 @@ public class ContractDao {
 
             }
         } catch (SQLException e) {
-            // e.printStackTrace();
             System.out.println("\n~~~~ Cannot add Vehicle to be leased ~~~~");
         }
     }
@@ -51,5 +50,6 @@ public class ContractDao {
             System.out.println("\n~~~~ Cannot add Vehicle for sale! ~~~~");
         }
     }
+
 
 }
