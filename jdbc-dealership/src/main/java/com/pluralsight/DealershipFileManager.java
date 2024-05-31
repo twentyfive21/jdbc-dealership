@@ -28,44 +28,5 @@ public class DealershipFileManager {
         currentVehicles.forEach(dealership::addVehicle);
         return dealership;
     }
-    /* ------------------ deleting vehicle -----------------------
 
-    // when deleting a vehicle delete from contracts first, inventory, then lastly vehicle
-    // DELETE FROM carDealership.LeaseContracts WHERE Vin = 1006;
-    // DELETE FROM carDealership.SalesContracts WHERE Vin = 1006;
-    // DELETE FROM carDealership.Inventory WHERE Vin = 1006;
-    // DELETE FROM carDealership.Vehicles WHERE Vin = 1006;
-
-    */
-
-
-
- /* ------------------ VEHICLE SALE -----------------------
-    // when doing a sale add to sales contract and set vehicle tables sold value to true
-     SELECT Vin FROM carDealership.SalesContracts; check for vins that do not match these
-     if not matching
-
-    INSERT INTO SalesContracts (Vin)
-    VALUES (1001);
-
-  */
-
-
-    /* ------------------ VEHICLE LEASE  -----------------------
-    // when leasing a vehicle check if in lease table if not allow to be leased
-    // show vehicles not leased
-
-        SELECT *
-        FROM carDealership.Vehicles
-        LEFT JOIN LeaseContracts ON Vehicles.Vin = LeaseContracts.Vin
-        WHERE LeaseContracts.Vin IS NULL;
-
-    // check if users vin is in lease if not add it use this to check
-     SELECT Vin FROM carDealership.LeaseContracts;
-
-    // then insert if doesnt match
-     INSERT INTO LeaseContracts (Vin)
-    VALUES (1001);
-
-     */
 }

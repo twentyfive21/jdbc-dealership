@@ -1,8 +1,8 @@
 package com.pluralsight;
 
+import com.pluralsight.daos.ContractDao;
 import com.pluralsight.daos.VehicleDao;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -10,9 +10,9 @@ public class UserInterface {
     // DeclareDealership object to manage dealership data
     private Dealership dealership;
     private VehicleDao vehicleDao = new VehicleDao(DatabaseConnector.setUpConnection());
+    private ContractDao contractDao = new ContractDao(DatabaseConnector.setUpConnection());
     // Initialization of a Scanner object for user input
     Scanner scanner = new Scanner(System.in);
-    ContractDataManager contractDataManager = new ContractDataManager();
 
     public UserInterface() {
         // empty constructor
@@ -129,35 +129,11 @@ public class UserInterface {
         }
     }
 
-    public Vehicle processContractType(String type) {
+    public void processContractType(String type) {
         System.out.printf("\nYou have chosen %s contract\n", type);
 
-        // ask for choice if sale contract
-        boolean userChoice = false;
-        if(type.equals("sale")){
-            System.out.println("Would you like to finance ? y(yes) or n(no)");
-            System.out.print("Selection: ");
-            String choice = scanner.nextLine().toLowerCase().trim();
-            switch (choice) {
-                case "y":
-                    userChoice = true;
-                    break;
-                case "n":
-                    userChoice = false;
-                    break;
-                default:
-                    System.out.println("Please pick yes or no!");
-                    processSellOrLeaseRequest();
-                    break;
-            }
-        }
-
-        // get contract data for csv
-        String contractDate = LocalDate.now().getYear() + "" + LocalDate.now().getDayOfMonth() + "" + LocalDate.now().getMonthValue();
         System.out.print("Please provide your name: ");
         String customerName = scanner.nextLine().trim();
-        System.out.print("Please provide your email: ");
-        String email = scanner.nextLine().trim();
         System.out.print("Please provide vin number of the car you want: ");
         int vinNum = scanner.nextInt();
         // clear buffer
@@ -171,25 +147,19 @@ public class UserInterface {
                 vehicleSold = vehicle;
             }
         }
-
         // create new object or print error based on search
         if(vehicleSold == null){
             System.out.println("*** Error no matching vehicle with that vin ***");
         } else if (type.equals("sale")){
-            SalesContract sale = new SalesContract(contractDate,customerName,email,vehicleSold,userChoice);
-            // pass contract to be written
-            contractDataManager.saveContract(sale);
+            contractDao.addVehicleForSale(vinNum);
         } else {
-            LeaseContract lease = new LeaseContract(contractDate,customerName,email,vehicleSold);
-            // pass contract to be written
-            contractDataManager.saveContract(lease);
+            contractDao.addVehicleForLease(vinNum);
         }
         // display removed vehicle
         System.out.printf("\n~~~~ Vehicle %s contract for %s ~~~~\n",type,customerName);
         System.out.println(vehicleSold);
         // delete from inventory
         dealership.removeVehicle(vehicleSold);
-        return vehicleSold;
     }
 
     public void processGetByPriceRequest() {
@@ -203,11 +173,7 @@ public class UserInterface {
             ArrayList<Vehicle> inRange = vehicleDao.getVehiclesByPrice(min, max);
             // Create a new ArrayList to store vehicles that fall within the specified price range
             // boolean for matching result
-            boolean match = false;
-
-            if(!inRange.isEmpty()){
-                match = true;
-            }
+            boolean match = !inRange.isEmpty();
 
             // Display vehicles in the price range
             displayVehicles(inRange);
@@ -261,9 +227,9 @@ public class UserInterface {
             scanner.nextLine();
 
             // create new arraylist to hold matching vehicles
-            ArrayList<Vehicle> yearMatch =vehicleDao.getVehiclesByYear(year);
-            // set match to false until match is founf
-            boolean match = yearMatch.isEmpty() ? false : true;
+            ArrayList<Vehicle> yearMatch = vehicleDao.getVehiclesByYear(year);
+            // set match to false until match is found
+            boolean match = !yearMatch.isEmpty();
             // send matching vehicles to be displayed
             displayVehicles(yearMatch);
             // display match results
@@ -288,7 +254,7 @@ public class UserInterface {
 
         // create array list for matching color vehicles
         ArrayList<Vehicle> matchingColor = vehicleDao.getVehiclesByColor(color);
-        boolean match = matchingColor.isEmpty() ? false : true;
+        boolean match = !matchingColor.isEmpty();
         // call display method
         displayVehicles(matchingColor);
         if (!match) {
@@ -310,7 +276,7 @@ public class UserInterface {
             // Create a new ArrayList to store vehicles that fall within the specified price range
             ArrayList<Vehicle> mileageMatch = vehicleDao.getVehiclesByMileage(min, max);
             // boolean for matching result
-            boolean match = mileageMatch.isEmpty() ? false : true;
+            boolean match = !mileageMatch.isEmpty();
 
             // Display vehicles in the price range
             displayVehicles(mileageMatch);
@@ -336,7 +302,7 @@ public class UserInterface {
 
         ArrayList<Vehicle> matchingType = vehicleDao.getVehiclesByType(carType);
 
-        boolean match = matchingType.isEmpty() ? false : true;
+        boolean match = !matchingType.isEmpty();
         // call display method
         displayVehicles(matchingType);
         // display message for match result
@@ -414,7 +380,6 @@ public class UserInterface {
                     break;
                 }
             }
-
 
             if (!found) {
                 System.out.println("\n**** Car not found with matching vin number! ****");
